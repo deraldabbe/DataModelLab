@@ -1,0 +1,193 @@
+User table:
+
+user_id (primary key)
+email
+password
+other user-related fields (e.g., name, profile picture)
+
+Recipe table:
+
+recipe_id (primary key)
+user_id (foreign key referencing User table)
+title
+description
+instructions
+is_public 
+
+Ingredient table:
+
+ingredient_id (primary key)
+name
+other ingredient-related fields (e.g., quantity, measurement unit)
+RecipeIngredient table (many-to-many relationship between Recipe and Ingredient):
+
+recipe_id (foreign key referencing Recipe table)
+ingredient_id (foreign key referencing Ingredient table)
+
+GroceryList table:
+
+list_id (primary key)
+user_id (foreign key referencing User table)
+name (optional, for user-defined list names)
+GroceryListItem table (many-to-many relationship between GroceryList and Ingredient):
+
+list_id (foreign key referencing GroceryList table)
+ingredient_id (foreign key referencing Ingredient table)
+
+Occasion table:
+
+occasion_id (primary key)
+user_id (foreign key referencing User table)
+name
+other occasion-related fields (e.g., date, description)
+RecipeOccasion table (many-to-many relationship between Recipe and Occasion):
+
+recipe_id (foreign key referencing Recipe table)
+occasion_id (foreign key referencing Occasion table)
+
+Table Ideas
+
+Users:
+
+This table will store user information, including their email, password, and other user-related fields. Each row will represent an individual user.
+
+UserRecipes:
+
+This table will hold information about recipes created by users. It will include details such as the recipe title, description, instructions, and a flag indicating whether the recipe is public or private. Each row will represent a single recipe.
+Ingredients:
+
+This table will store information about individual ingredients used in recipes. Each row will represent an ingredient, including fields like the ingredient name and other relevant details.
+
+RecipeIngredients:
+
+This table will establish a many-to-many relationship between recipes and ingredients. It will contain the recipe_id and ingredient_id as foreign keys, linking recipes to their respective ingredients.
+GroceryLists:
+
+This table will store information about user-specific grocery lists. Each row will represent a grocery list and may include fields like the list name.
+
+GroceryListItems:
+
+This table will establish a many-to-many relationship between grocery lists and ingredients. It will contain the list_id and ingredient_id as foreign keys, linking grocery lists to the ingredients they contain.
+Occasions:
+
+This table will store information about user-defined occasions. Each row will represent an occasion and may include fields like the occasion name, date, and description.
+
+RecipeOccasions:
+
+This table will establish a many-to-many relationship between recipes and occasions. It will contain the recipe_id and occasion_id as foreign keys, linking recipes to the occasions they are assigned to.
+
+Relationships
+
+One-to-One:
+
+Users and Recipes: 
+Each user can have multiple recipes, but each recipe is associated with only one user. This relationship allows a user to own their recipes and manage them individually.
+Recipes and RecipeIngredients: 
+Each recipe can have multiple ingredients, but each ingredient belongs to a specific recipe. This relationship ensures that the ingredients are linked to the correct recipe.
+
+One-to-Many:
+
+Users and Recipes: 
+Each user can have multiple recipes, but each recipe is associated with only one user. This relationship allows users to have their own collection of recipes.
+Users and GroceryLists: 
+Each user can have multiple grocery lists, but each grocery list belongs to a specific user. This relationship allows users to manage their own personalized grocery lists.
+Occasions and Recipes: 
+Each occasion can have multiple recipes, but each recipe can be assigned to only one occasion. This relationship allows recipes to be associated with specific occasions.
+
+Many-to-Many:
+
+Recipes and Ingredients: 
+Each recipe can have multiple ingredients, and each ingredient can be used in multiple recipes. This relationship allows for flexibility in recipe creation and ingredient reuse across recipes.
+GroceryLists and Ingredients: 
+Each grocery list can have multiple ingredients, and each ingredient can be present in multiple grocery lists. This relationship allows users to add ingredients from various recipes to their grocery lists.
+
+Columns:
+
+Users:
+
+user_id (Primary Key, Integer): Unique identifier for each user.
+email (String): User's email address used for authentication and communication.
+password (String): Encrypted password for user authentication.
+
+Recipes:
+
+recipe_id (Primary Key, Integer): Unique identifier for each recipe.
+user_id (Foreign Key, Integer): Reference to the user who created the recipe.
+title (String): Title of the recipe.
+instructions (Text): Detailed instructions for preparing the recipe.
+is_public (Boolean): Flag indicating whether the recipe is public or private.
+
+Ingredients:
+
+ingredient_id (Primary Key, Integer): Unique identifier for each ingredient.
+name (String): Name of the ingredient.
+
+
+GroceryLists:
+
+list_id (Primary Key, Integer): Unique identifier for each grocery list.
+user_id (Foreign Key, Integer): Reference to the user who owns the grocery list.
+ingredient_id (Foreign Key, Integer): Reference to the ingredient.
+
+GroceryListItems:
+
+Occasions:
+
+occasion_id (Primary Key, Integer): Unique identifier for each occasion.
+user_id (Foreign Key, Integer): Reference to the user who created the occasion.
+function (String): Name or title of the occasion.
+recipe_id (Foreign Key, Integer): Reference to the recipe.
+
+
+SQL
+
+CREATE TABLE Users (
+  user_id SERIAL PRIMARY KEY,
+  email VARCHAR(255),
+  password VARCHAR(255),
+  username VARCHAR(255)
+);
+
+CREATE TABLE Recipes (
+  recipe_id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES Users(user_id),
+  title VARCHAR(255),
+  instructions TEXT,
+  is_public BOOLEAN
+);
+
+CREATE TABLE Ingredients (
+  ingredient_id SERIAL PRIMARY KEY,
+  ingredientName VARCHAR(255)
+);
+
+CREATE TABLE RecipeIngredients (
+  recipe_id INTEGER REFERENCES Recipes(recipe_id),
+  ingredient_id INTEGER REFERENCES Ingredients(ingredient_id),
+  PRIMARY KEY (recipe_id, ingredient_id)
+);
+
+CREATE TABLE GroceryLists (
+  list_id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES Users(user_id),
+  ingredient_id INTEGER REFERENCES Ingredients(ingredient_id)
+);
+
+CREATE TABLE GroceryListItems (
+  list_id INTEGER REFERENCES GroceryLists(list_id),
+  ingredient_id INTEGER REFERENCES Ingredients(ingredient_id),
+  PRIMARY KEY (list_id, ingredient_id)
+);
+
+CREATE TABLE Occasions (
+  occasion_id SERIAL PRIMARY KEY,
+  user_id INTEGER REFERENCES Users(user_id),
+  function VARCHAR(255),
+  recipe_id INTEGER REFERENCES Recipes(recipe_id)
+);
+
+CREATE TABLE RecipeOccasions (
+  recipe_id INTEGER REFERENCES Recipes(recipe_id),
+  occasion_id INTEGER REFERENCES Occasions(occasion_id),
+  PRIMARY KEY (recipe_id, occasion_id)
+);
